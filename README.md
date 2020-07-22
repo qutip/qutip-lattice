@@ -14,7 +14,7 @@ GSoC student (Main developer): [Saumya biswas](https://github.com/sbisw002)
 
 Mentors: 
 [E. Giguère](https://github.com/ericgig),
-[C. Gneiting],
+C. Gneiting,
 and [N. Shammah](https://github.com/nathanshammah)
 
 Support
