@@ -1,0 +1,3 @@
+qutip>=4.4
+numpy>=1.12
+scipy>=1.0
