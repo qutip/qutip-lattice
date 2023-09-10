@@ -30,9 +30,6 @@
 #    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 #    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ###############################################################################
-
-__all__ = ['berry_curvature', 'plot_berry_curvature']
-
 from qutip import (Qobj, tensor, basis, qeye, isherm, sigmax, sigmay, sigmaz)
 import numpy as np
 
@@ -40,6 +37,8 @@ try:
     import matplotlib.pyplot as plt
 except:
     pass
+
+__all__ = ['berry_curvature', 'plot_berry_curvature']
 
 
 def berry_curvature(eigfs):

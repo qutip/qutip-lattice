@@ -30,10 +30,6 @@
 #    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 #    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ###############################################################################
-
-
-__all__ = ['Lattice1d', 'cell_structures']
-
 from scipy.sparse import (csr_matrix)
 from qutip import (Qobj, tensor, basis, qeye, sigmax, sigmay, sigmaz)
 
@@ -43,6 +39,8 @@ try:
     import matplotlib.pyplot as plt
 except ImportError:
     pass
+
+__all__ = ['Lattice1d', 'cell_structures']
 
 
 def cell_structures(val_s=None, val_t=None, val_u=None):
@@ -1025,7 +1023,7 @@ class Lattice1d():
         chiral_op = self.distribute_operator(sigmaz())
         Hamt = self.Hamiltonian()
         anti_commutator_chi_H = chiral_op * Hamt + Hamt * chiral_op
-        is_null = (np.abs(anti_commutator_chi_H) < 1E-10).all()
+        is_null = (np.abs(anti_commutator_chi_H.full()) < 1E-10).all()
 
         if not is_null:
             raise Exception("The Hamiltonian does not have chiral symmetry!")
