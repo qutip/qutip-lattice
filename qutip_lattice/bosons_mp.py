@@ -58,11 +58,11 @@ __all__ = ['Lattice1d_bose_Hubbard', 'Lattice1d_hardcorebosons',
            'Lattice1d_2c_hcb_Hubbard']
 
 class Lattice1d_hardcorebosons():
-    """A class for representing a 1d lattice with fermions hopping around in
-    the many particle physics picture.
+    """A class for representing a 1d lattice with hardcore bosons hopping
+    around in the many particle physics picture.
 
-    The Lattice1d_fermions class can be defined with any specific unit cells
-    and a specified number of unit cells in the crystal.  It can return
+    The Lattice1d_hardcorebosons class can be defined with any specific unit
+    cells and a specified number of unit cells in the crystal.  It can return
     Hamiltonians written in a chosen (with specific symmetry) basis and
     unitary transformations that can be used in switching between them.
 
