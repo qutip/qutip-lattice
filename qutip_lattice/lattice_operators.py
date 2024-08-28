@@ -52,15 +52,15 @@ from numpy import asarray
 import math
 from .tran_sym_functions import *
 
-__all__ = ['n_i', 'ncr', 'Ls_I', 'Sx', 'Sy', 'Sz', 'b', 'bd', 'f', 'fd',
-           'List_prd', 'ncr', 'm_r', 'm_i', 'getNearestNeighbors',
+__all__ = ['n_i', 'ncr', 'Is', 'Sx', 'Sy', 'Sz', 'I', 'b_', 'bd', 'a_', 'ad',
+           'oprd', 'ncr', 'anticommutator', 'getNearestNeighbors',
            'createHeisenbergBasis', 'calcHubbardDiag',
            'Uterms_hamiltonDiagNoSym', 'n_i', 'Vterms_hamiltonDiagNoSym',
            'HamiltonDownNoSym', 'hamiltonUpNoSyms',
            'createHeisenbergfullBasis', 'createBosonBasis']
 
 
-def Ls_I(i, levels=2):
+def Is(i, levels=2):
     """
     Returns a list of identity operators of dimension levels.
 
@@ -76,22 +76,6 @@ def Ls_I(i, levels=2):
     return [qeye(levels) for j in range(0, i)]
 
 
-def Tensor_I(i, levels=2):
-    """
-    Returns the tensor of identity operators of dimension levels.
-
-    Parameters
-    ==========
-    levels : int
-        the dimension of identity operators.
-
-    Returns
-    -------
-        a list of identity operators
-    """
-    return tensor(Ls_I(i, levels=2))
-
-
 def Sx(N, i):
     """
     Returns the spin operator Sx.
@@ -105,7 +89,7 @@ def Sx(N, i):
     -------
         operator Sx
     """
-    return tensor(Ls_I(i) + [sigmax()] + Ls_I(N - i - 1))
+    return tensor(Is(i) + [sigmax()] + Is(N - i - 1))
 
 
 def Sy(N, i):
@@ -121,7 +105,7 @@ def Sy(N, i):
     -------
         operator Sy
     """
-    return tensor(Ls_I(i) + [sigmay()] + Ls_I(N - i - 1))
+    return tensor(Is(i) + [sigmay()] + Is(N - i - 1))
 
 
 def Sz(N, i):
@@ -137,7 +121,7 @@ def Sz(N, i):
     -------
         operator Sx
     """
-    return tensor(Ls_I(i) + [sigmaz()] + Ls_I(N - i - 1))
+    return tensor(Is(i) + [sigmaz()] + Is(N - i - 1))
 
 
 def I(N):
@@ -156,7 +140,7 @@ def I(N):
     return Sz(N, 0)*Sz(N, 0)
 
 
-def b(N, Np, i):
+def b_(N, Np, i):
     """
     Returns the bosonic annihilation operator at site N.
 
@@ -167,9 +151,10 @@ def b(N, Np, i):
 
     Returns
     -------
-        the bosonic annihilation operator
+        the annihilation operator
     """
-    return tensor(Ls_I(i, levels=Np+1) + [destroy(Np+1)] + Ls_I(N - i - 1, levels=Np+1))
+    return tensor(
+            Is(i, levels=Np+1) + [destroy(Np+1)] + Is(N - i - 1, levels=Np+1))
 
 
 def bd(N, Np, i):
@@ -183,12 +168,13 @@ def bd(N, Np, i):
 
     Returns
     -------
-        the bosonic creation operator
+        the creation operator
     """
-    return tensor(Ls_I(i, levels=Np+1) + [create(Np+1)] + Ls_I(N - i - 1, levels=Np+1))
+    return tensor(
+            Is(i, levels=Np+1) + [create(Np+1)] + Is(N - i - 1, levels=Np+1))
 
 
-def List_prd(lst, d=None):
+def oprd(lst, d=None):
     """
     Returns the product of all elements of a list.
 
@@ -204,7 +190,18 @@ def List_prd(lst, d=None):
     return p
 
 
-def f(N, n, Opers=None):
+def anticommutator(A, B):
+    """
+    Returns the quantum mechanical anticommutator.
+
+    Returns
+    -------
+        the anticommutator
+    """
+    return A*B + B*A
+
+
+def a_(N, n, Opers=None):
     """
     Returns the fermionic annihilation operator at site n.
 
@@ -215,16 +212,16 @@ def f(N, n, Opers=None):
 
     Returns
     -------
-        the fermionic annihilation operator
+        the fermionic operator
     """
     Sa, Sb, Sc = Sz, Sx, Sy
     if Opers is not None:
         Sa, Sb, Sc = Opers
-    return List_prd(
-            [Sa(N, j) for j in range(n)], d=I(N))*(Sb(N, n) + 1j*Sc(N, n))/2
+    return oprd(
+            [Sa(N, j) for j in range(n)], d=I(N))*(Sb(N, n) + 1j*Sc(N, n))/2.
 
 
-def fd(N, n, Opers=None):
+def ad(N, n, Opers=None):
     """
     Returns the fermionic creation operator at site n.
 
@@ -235,55 +232,13 @@ def fd(N, n, Opers=None):
 
     Returns
     -------
-        the fermionic creation operator
+        the creation operator
     """
     Sa, Sb, Sc = Sz, Sx, Sy
     if Opers is not None:
         Sa, Sb, Sc = Opers
-    return List_prd(
-            [Sa(N, j) for j in range(n)], d=I(N))*(Sb(N, n) - 1j*Sc(N, n))/2
-
-
-def m_r(N, n, Opers=None):
-    """
-    Returns the majorana (real fermionic) annihilation/cration operator at site
-    n.
-
-    Parameters
-    ==========
-    N : int
-        the length of lattice.
-
-    Returns
-    -------
-        the fermionic annihilation operator
-    """
-    Sa, Sb, Sc = Sz, Sx, Sy
-    if Opers is not None:
-        Sa, Sb, Sc = Opers
-    return List_prd(
-            [Sa(N, j) for j in range(n)], d=I(N))*Sb(N, n)/2
-
-
-def m_i(N, n, Opers=None):
-    """
-    Returns the majorana (imaginary fermionic) annihilation/creation operator
-    at site n.
-
-    Parameters
-    ==========
-    N : int
-        the length of lattice.
-
-    Returns
-    -------
-        the fermionic creation operator
-    """
-    Sa, Sb, Sc = Sz, Sx, Sy
-    if Opers is not None:
-        Sa, Sb, Sc = Opers
-    return List_prd(
-            [Sa(N, j) for j in range(n)], d=I(N))*Sc(N, n)/2
+    return oprd(
+            [Sa(N, j) for j in range(n)], d=I(N))*(Sb(N, n) - 1j*Sc(N, n))/2.
 
 
 def getNearestNeighbors(**kwargs):
